@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace WaypointBench\Adapter;
 
 use Nette\Routing\RouteList;
-use Nette\Routing\Route;
-use WaypointBench\RouteSet\RouteDefinition;
 
 final class NetteAdapter implements AdapterInterface
 {

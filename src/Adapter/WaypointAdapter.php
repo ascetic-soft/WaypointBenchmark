@@ -8,7 +8,6 @@ use AsceticSoft\Waypoint\Router;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\ServerRequest;
 use WaypointBench\Handler\BenchmarkHandler;
-use WaypointBench\RouteSet\RouteDefinition;
 use WaypointBench\Support\SimpleContainer;
 
 final class WaypointAdapter implements AdapterInterface, CacheableAdapterInterface

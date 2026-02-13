@@ -47,8 +47,8 @@ final class BenchmarkCommand extends Command
         $runs = (int) $input->getOption('runs');
 
         $io->title('Waypoint Router Benchmark');
-        $io->text(sprintf('PHP %s | %s | %s', PHP_VERSION, PHP_OS, date('Y-m-d H:i:s')));
-        $io->text(sprintf('Runs per test: %d (using median)', $runs));
+        $io->text(\sprintf('PHP %s | %s | %s', PHP_VERSION, PHP_OS, date('Y-m-d H:i:s')));
+        $io->text(\sprintf('Runs per test: %d (using median)', $runs));
         $io->newLine();
 
         $adapters = $this->getAdapters($input);
@@ -67,7 +67,7 @@ final class BenchmarkCommand extends Command
                 : $adapters;
 
             // Scenario is either a Closure (simple) or an array with setup/run/teardown (cached)
-            $hasLifecycle = is_array($scenarioFn);
+            $hasLifecycle = \is_array($scenarioFn);
             $setupFn = $hasLifecycle ? $scenarioFn['setup'] : null;
             $runFn = $hasLifecycle ? $scenarioFn['run'] : $scenarioFn;
             $teardownFn = $hasLifecycle ? ($scenarioFn['teardown'] ?? null) : null;
@@ -103,7 +103,7 @@ final class BenchmarkCommand extends Command
                     }
 
                     sort($timings);
-                    $median = $timings[(int) floor(count($timings) / 2)];
+                    $median = $timings[(int) floor(\count($timings) / 2)];
 
                     $results[] = [
                         'name' => $name,
@@ -167,7 +167,7 @@ final class BenchmarkCommand extends Command
 
         return array_filter(
             $all,
-            static fn (AdapterInterface $a) => in_array(strtolower($a->getName()), $names, true),
+            static fn (AdapterInterface $a) => \in_array(strtolower($a->getName()), $names, true),
         );
     }
 
@@ -367,9 +367,9 @@ final class BenchmarkCommand extends Command
 
     private function getCacheDir(): string
     {
-        $dir = dirname(__DIR__, 2) . '/var/cache';
-        if (!is_dir($dir)) {
-            mkdir($dir, 0777, true);
+        $dir = \dirname(__DIR__, 2) . '/var/cache';
+        if (!is_dir($dir) && !mkdir($dir, 0777, true) && !is_dir($dir)) {
+            throw new \RuntimeException(\sprintf('Directory "%s" was not created', $dir));
         }
 
         return $dir;

@@ -53,8 +53,6 @@ final class LaravelAdapter implements AdapterInterface
     {
         $request = Request::create($uri, $method);
 
-        $response = $this->router->dispatch($request);
-
-        return $response->getContent();
+        return $this->router->dispatch($request)->getContent();
     }
 }

@@ -15,10 +15,10 @@ use Psr\Http\Message\ServerRequestInterface;
  * This handler reads the '_bench_handler' attribute set on the route to return
  * the correct handler identifier string.
  */
-final class BenchmarkHandler
+final readonly class BenchmarkHandler
 {
     public function __construct(
-        private readonly Psr17Factory $factory,
+        private Psr17Factory $factory,
     ) {}
 
     public function handle(ServerRequestInterface $request): ResponseInterface

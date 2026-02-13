@@ -22,7 +22,7 @@ final class SimpleContainer implements ContainerInterface
     public function get(string $id): mixed
     {
         if (!$this->has($id)) {
-            throw new \RuntimeException("Entry not found: {$id}");
+            throw new \RuntimeException("Entry not found: $id");
         }
 
         return $this->entries[$id];
@@ -30,6 +30,6 @@ final class SimpleContainer implements ContainerInterface
 
     public function has(string $id): bool
     {
-        return array_key_exists($id, $this->entries);
+        return \array_key_exists($id, $this->entries);
     }
 }

@@ -6,7 +6,6 @@ namespace WaypointBench\Adapter;
 
 use Phroute\Phroute\Dispatcher;
 use Phroute\Phroute\RouteCollector;
-use WaypointBench\RouteSet\RouteDefinition;
 
 final class PHRouteAdapter implements AdapterInterface
 {

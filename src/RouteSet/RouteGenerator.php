@@ -33,8 +33,8 @@ final class RouteGenerator
         $routes = [];
         $segments = self::SEGMENTS;
         $actions = self::ACTIONS;
-        $segCount = count($segments);
-        $actCount = count($actions);
+        $segCount = \count($segments);
+        $actCount = \count($actions);
 
         for ($i = 0; $i < $count; $i++) {
             // Build unique path: /{segment}/{action}/{index}
@@ -66,7 +66,7 @@ final class RouteGenerator
     {
         $routes = [];
         $segments = self::SEGMENTS;
-        $segCount = count($segments);
+        $segCount = \count($segments);
 
         for ($i = 0; $i < $count; $i++) {
             $seg = $segments[$i % $segCount];
