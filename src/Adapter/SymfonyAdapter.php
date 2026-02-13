@@ -4,17 +4,22 @@ declare(strict_types=1);
 
 namespace WaypointBench\Adapter;
 
+use Symfony\Component\Routing\Matcher\CompiledUrlMatcher;
+use Symfony\Component\Routing\Matcher\Dumper\CompiledUrlMatcherDumper;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
+use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use WaypointBench\RouteSet\RouteDefinition;
 
-final class SymfonyAdapter implements AdapterInterface
+final class SymfonyAdapter implements AdapterInterface, CacheableAdapterInterface
 {
     private RouteCollection $routeCollection;
-    private UrlMatcher $matcher;
+    private UrlMatcherInterface $matcher;
     private RequestContext $context;
+
+    private const string CACHE_FILE = 'symfony_compiled_routes.php';
 
     public function getName(): string
     {
@@ -30,7 +35,6 @@ final class SymfonyAdapter implements AdapterInterface
     public function registerRoutes(array $routes): void
     {
         foreach ($routes as $i => $route) {
-            // Convert {param} to {param} (Symfony uses the same syntax)
             $symfonyRoute = new Route(
                 path: $route->pattern,
                 defaults: ['_handler' => $route->handler],
@@ -50,5 +54,37 @@ final class SymfonyAdapter implements AdapterInterface
         $result = $this->matcher->match($uri);
 
         return $result['_handler'];
+    }
+
+    // --- CacheableAdapterInterface ---
+
+    public function warmCache(array $routes, string $cacheDir): void
+    {
+        $this->initialize();
+        $this->registerRoutes($routes);
+
+        $dumper = new CompiledUrlMatcherDumper($this->routeCollection);
+        $compiledRoutes = $dumper->dump();
+
+        file_put_contents(
+            $cacheDir . '/' . self::CACHE_FILE,
+            $compiledRoutes,
+        );
+    }
+
+    public function initializeFromCache(string $cacheDir): void
+    {
+        $this->context = new RequestContext();
+        $compiledRoutes = require $cacheDir . '/' . self::CACHE_FILE;
+
+        $this->matcher = new CompiledUrlMatcher($compiledRoutes, $this->context);
+    }
+
+    public function clearCache(string $cacheDir): void
+    {
+        $file = $cacheDir . '/' . self::CACHE_FILE;
+        if (file_exists($file)) {
+            unlink($file);
+        }
     }
 }

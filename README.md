@@ -51,7 +51,7 @@ Filter by scenario:
 php bin/benchmark --scenario=static,dynamic
 ```
 
-Available scenarios: `static`, `dynamic`, `registration`, `highload`
+Available scenarios: `static`, `dynamic`, `registration`, `highload`, `cached`
 
 Adjust number of runs (default 20):
 
@@ -74,6 +74,7 @@ vendor/bin/phpbench run --report=aggregate --group=static
 vendor/bin/phpbench run --report=aggregate --group=dynamic
 vendor/bin/phpbench run --report=aggregate --group=registration
 vendor/bin/phpbench run --report=aggregate --group=highload
+vendor/bin/phpbench run --report=aggregate --group=cached
 ```
 
 ### Makefile shortcuts
@@ -101,6 +102,14 @@ Measures initialization + registration time for 100, 500, and 1000 routes.
 - 100 dynamic routes x50 repeated dispatches
 - 1000 mixed routes: register + dispatch all
 
+### 5. Cached Route Dispatching
+Tests routers with built-in caching support (Waypoint, FastRoute, Symfony).
+Routes are compiled to cache files, then loaded and dispatched to measure production-like performance.
+- 100 static routes: load from cache + dispatch all
+- 100 dynamic routes: load from cache + dispatch all
+- 500 mixed routes: load from cache + dispatch all
+- 1000 mixed routes: load from cache + dispatch all
+
 ## Architecture
 
 Each router is wrapped in an adapter implementing `AdapterInterface`:
@@ -115,6 +124,17 @@ interface AdapterInterface
 }
 ```
 
+Routers with caching support also implement `CacheableAdapterInterface`:
+
+```php
+interface CacheableAdapterInterface extends AdapterInterface
+{
+    public function warmCache(array $routes, string $cacheDir): void;
+    public function initializeFromCache(string $cacheDir): void;
+    public function clearCache(string $cacheDir): void;
+}
+```
+
 Routes are generated deterministically by `RouteGenerator` to ensure fair comparison.
 
 ## Project Structure
@@ -126,10 +146,12 @@ Routes are generated deterministically by `RouteGenerator` to ensure fair compar
 │   ├── StaticRouteBench.php
 │   ├── DynamicRouteBench.php
 │   ├── RegistrationBench.php
-│   └── HighLoadBench.php
+│   ├── HighLoadBench.php
+│   └── CachedRouteBench.php
 ├── src/
 │   ├── Adapter/               # Router adapters
 │   │   ├── AdapterInterface.php
+│   │   ├── CacheableAdapterInterface.php
 │   │   ├── WaypointAdapter.php
 │   │   ├── FastRouteAdapter.php
 │   │   ├── SymfonyAdapter.php
@@ -144,6 +166,8 @@ Routes are generated deterministically by `RouteGenerator` to ensure fair compar
 │   ├── RouteSet/
 │   │   ├── RouteDefinition.php
 │   │   └── RouteGenerator.php
+│   ├── Handler/
+│   │   └── BenchmarkHandler.php
 │   └── Support/
 │       └── SimpleContainer.php
 ├── composer.json

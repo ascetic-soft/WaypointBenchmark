@@ -3,6 +3,9 @@
 
 declare(strict_types=1);
 
+// Suppress warnings from routers that access $_SERVER in CLI context
+error_reporting(E_ERROR | E_PARSE);
+
 require __DIR__ . '/../vendor/autoload.php';
 
 use Symfony\Component\Console\Application;

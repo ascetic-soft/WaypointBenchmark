@@ -7,7 +7,6 @@ namespace WaypointBench\Cli;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
-use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -15,6 +14,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use WaypointBench\Adapter\AdapterInterface;
 use WaypointBench\Adapter\AltoRouterAdapter;
 use WaypointBench\Adapter\BramusAdapter;
+use WaypointBench\Adapter\CacheableAdapterInterface;
 use WaypointBench\Adapter\FastRouteAdapter;
 use WaypointBench\Adapter\LaravelAdapter;
 use WaypointBench\Adapter\LeagueAdapter;
@@ -37,7 +37,7 @@ final class BenchmarkCommand extends Command
     {
         $this
             ->addOption('router', 'r', InputOption::VALUE_OPTIONAL, 'Comma-separated list of router names to test')
-            ->addOption('scenario', 's', InputOption::VALUE_OPTIONAL, 'Comma-separated list of scenarios (static,dynamic,registration,highload)')
+            ->addOption('scenario', 's', InputOption::VALUE_OPTIONAL, 'Comma-separated list of scenarios (static,dynamic,registration,highload,cached)')
             ->addOption('runs', null, InputOption::VALUE_OPTIONAL, 'Number of runs per test (default: 20)', (string) self::DEFAULT_RUNS);
     }
 
@@ -54,12 +54,19 @@ final class BenchmarkCommand extends Command
         $adapters = $this->getAdapters($input);
         $scenarios = $this->getScenarios($input);
 
+        $isCachedScenario = static fn (string $name): bool => str_starts_with($name, 'Cached:');
+
         foreach ($scenarios as $scenarioName => $scenarioFn) {
             $io->section($scenarioName);
 
             $results = [];
 
-            foreach ($adapters as $adapter) {
+            // For cached scenarios, only include cacheable adapters
+            $scenarioAdapters = $isCachedScenario($scenarioName)
+                ? array_filter($adapters, static fn ($a) => $a instanceof CacheableAdapterInterface)
+                : $adapters;
+
+            foreach ($scenarioAdapters as $adapter) {
                 $name = $adapter->getName();
 
                 try {
@@ -102,6 +109,9 @@ final class BenchmarkCommand extends Command
         }
 
         $io->success('Benchmark complete.');
+
+        // Clean up cache directory
+        $this->cleanupCacheDir();
 
         return Command::SUCCESS;
     }
@@ -185,6 +195,20 @@ final class BenchmarkCommand extends Command
                     50,
                 ),
                 'Large-Scale: 1000 Mixed Routes, Dispatch All' => $this->scenarioDispatchAll(
+                    RouteGenerator::mixedRoutes(1000),
+                ),
+            ],
+            'cached' => [
+                'Cached: Load 100 Static + Dispatch All' => $this->scenarioCachedDispatchAll(
+                    RouteGenerator::staticRoutes(100),
+                ),
+                'Cached: Load 100 Dynamic + Dispatch All' => $this->scenarioCachedDispatchAll(
+                    RouteGenerator::dynamicRoutes(100),
+                ),
+                'Cached: Load 500 Mixed + Dispatch All' => $this->scenarioCachedDispatchAll(
+                    RouteGenerator::mixedRoutes(500),
+                ),
+                'Cached: Load 1000 Mixed + Dispatch All' => $this->scenarioCachedDispatchAll(
                     RouteGenerator::mixedRoutes(1000),
                 ),
             ],
@@ -277,6 +301,60 @@ final class BenchmarkCommand extends Command
                 }
             }
         };
+    }
+
+    /**
+     * Cached scenario: warm cache (not timed), then load from cache + dispatch all (timed).
+     * Only runs for adapters implementing CacheableAdapterInterface; skips others.
+     *
+     * @param RouteDefinition[] $routes
+     */
+    private function scenarioCachedDispatchAll(array $routes): \Closure
+    {
+        $cacheDir = $this->getCacheDir();
+
+        return static function (AdapterInterface $adapter) use ($routes, $cacheDir): void {
+            if (!$adapter instanceof CacheableAdapterInterface) {
+                throw new \RuntimeException('Not cacheable');
+            }
+
+            // Warm cache (done every run to ensure fresh state, but this
+            // overhead is minimal and consistent across routers)
+            $adapter->warmCache($routes, $cacheDir);
+
+            // Timed: load from cache + dispatch
+            $adapter->initializeFromCache($cacheDir);
+
+            foreach ($routes as $route) {
+                $adapter->dispatch($route->method, $route->testUri);
+            }
+
+            $adapter->clearCache($cacheDir);
+        };
+    }
+
+    private function getCacheDir(): string
+    {
+        $dir = dirname(__DIR__, 2) . '/var/cache';
+        if (!is_dir($dir)) {
+            mkdir($dir, 0777, true);
+        }
+
+        return $dir;
+    }
+
+    private function cleanupCacheDir(): void
+    {
+        $dir = $this->getCacheDir();
+        if (is_dir($dir)) {
+            $files = glob($dir . '/*');
+            if ($files !== false) {
+                foreach ($files as $file) {
+                    unlink($file);
+                }
+            }
+            rmdir($dir);
+        }
     }
 
     /**

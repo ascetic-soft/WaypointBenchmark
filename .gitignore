@@ -2,4 +2,5 @@
 /composer.lock
 /.phpbench/
 /.idea/
+/var/
 *.cache
