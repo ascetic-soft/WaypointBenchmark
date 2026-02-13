@@ -66,10 +66,21 @@ final class BenchmarkCommand extends Command
                 ? array_filter($adapters, static fn ($a) => $a instanceof CacheableAdapterInterface)
                 : $adapters;
 
+            // Scenario is either a Closure (simple) or an array with setup/run/teardown (cached)
+            $hasLifecycle = is_array($scenarioFn);
+            $setupFn = $hasLifecycle ? $scenarioFn['setup'] : null;
+            $runFn = $hasLifecycle ? $scenarioFn['run'] : $scenarioFn;
+            $teardownFn = $hasLifecycle ? ($scenarioFn['teardown'] ?? null) : null;
+
             foreach ($scenarioAdapters as $adapter) {
                 $name = $adapter->getName();
 
                 try {
+                    // Setup phase (e.g., warm cache) — outside timing loop
+                    if ($setupFn !== null) {
+                        $setupFn($adapter);
+                    }
+
                     $timings = [];
                     $peakMemory = 0;
 
@@ -77,13 +88,18 @@ final class BenchmarkCommand extends Command
                         $memBefore = memory_get_usage(true);
                         $start = hrtime(true);
 
-                        $scenarioFn($adapter);
+                        $runFn($adapter);
 
                         $elapsed = (hrtime(true) - $start) / 1_000_000; // ms
                         $memAfter = memory_get_peak_usage(true);
 
                         $timings[] = $elapsed;
                         $peakMemory = max($peakMemory, $memAfter - $memBefore);
+                    }
+
+                    // Teardown phase (e.g., clear cache) — after timing loop
+                    if ($teardownFn !== null) {
+                        $teardownFn($adapter);
                     }
 
                     sort($timings);
@@ -96,6 +112,14 @@ final class BenchmarkCommand extends Command
                         'error' => null,
                     ];
                 } catch (\Throwable $e) {
+                    // Ensure cleanup even on error
+                    if ($teardownFn !== null) {
+                        try {
+                            $teardownFn($adapter);
+                        } catch (\Throwable) {
+                        }
+                    }
+
                     $results[] = [
                         'name' => $name,
                         'time' => PHP_FLOAT_MAX,
@@ -148,7 +172,7 @@ final class BenchmarkCommand extends Command
     }
 
     /**
-     * @return array<string, \Closure>
+     * @return array<string, \Closure|array{setup: \Closure, run: \Closure, teardown?: \Closure}>
      */
     private function getScenarios(InputInterface $input): array
     {
@@ -304,33 +328,41 @@ final class BenchmarkCommand extends Command
     }
 
     /**
-     * Cached scenario: warm cache (not timed), then load from cache + dispatch all (timed).
-     * Only runs for adapters implementing CacheableAdapterInterface; skips others.
+     * Cached scenario: warm cache once (setup), then load from cache + dispatch all (timed).
+     * Only runs for adapters implementing CacheableAdapterInterface.
      *
      * @param RouteDefinition[] $routes
+     * @return array{setup: \Closure, run: \Closure, teardown: \Closure}
      */
-    private function scenarioCachedDispatchAll(array $routes): \Closure
+    private function scenarioCachedDispatchAll(array $routes): array
     {
         $cacheDir = $this->getCacheDir();
 
-        return static function (AdapterInterface $adapter) use ($routes, $cacheDir): void {
-            if (!$adapter instanceof CacheableAdapterInterface) {
-                throw new \RuntimeException('Not cacheable');
-            }
-
-            // Warm cache (done every run to ensure fresh state, but this
-            // overhead is minimal and consistent across routers)
-            $adapter->warmCache($routes, $cacheDir);
-
-            // Timed: load from cache + dispatch
-            $adapter->initializeFromCache($cacheDir);
-
-            foreach ($routes as $route) {
-                $adapter->dispatch($route->method, $route->testUri);
-            }
-
-            $adapter->clearCache($cacheDir);
-        };
+        return [
+            // Warm cache once before timing loop
+            'setup' => static function (AdapterInterface $adapter) use ($routes, $cacheDir): void {
+                if (!$adapter instanceof CacheableAdapterInterface) {
+                    throw new \RuntimeException('Not cacheable');
+                }
+                $adapter->warmCache($routes, $cacheDir);
+            },
+            // Timed: load from cache + dispatch (this runs N times)
+            'run' => static function (AdapterInterface $adapter) use ($routes, $cacheDir): void {
+                if (!$adapter instanceof CacheableAdapterInterface) {
+                    throw new \RuntimeException('Not cacheable');
+                }
+                $adapter->initializeFromCache($cacheDir);
+                foreach ($routes as $route) {
+                    $adapter->dispatch($route->method, $route->testUri);
+                }
+            },
+            // Clean up after all runs
+            'teardown' => static function (AdapterInterface $adapter) use ($cacheDir): void {
+                if ($adapter instanceof CacheableAdapterInterface) {
+                    $adapter->clearCache($cacheDir);
+                }
+            },
+        ];
     }
 
     private function getCacheDir(): string
