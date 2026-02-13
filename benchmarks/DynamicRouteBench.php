@@ -5,69 +5,68 @@ declare(strict_types=1);
 namespace WaypointBench\Benchmarks;
 
 use PhpBench\Attributes as Bench;
-use WaypointBench\Adapter\AdapterInterface;
-use WaypointBench\RouteSet\RouteGenerator;
 
 /**
- * Benchmark: dispatching dynamic routes (with parameters).
+ * Benchmark: real request lifecycle with dynamic routes (with parameters).
+ *
+ * Each rev simulates a real HTTP request: boot router (from cache or fresh) + dispatch.
  */
 #[Bench\Groups(['dynamic'])]
 class DynamicRouteBench extends AbstractRouteBench
 {
     /**
-     * Dispatch a single dynamic route out of 100 registered.
+     * Single request: dispatch a middle dynamic route out of 100.
      */
     #[Bench\Revs(1000)]
     #[Bench\Iterations(5)]
     #[Bench\Warmup(2)]
     #[Bench\ParamProviders('provideAdapters')]
+    #[Bench\BeforeMethods(['setupDynamicRoutes100'])]
+    #[Bench\AfterMethods(['clearCache'])]
     public function benchSingleDynamicRoute(array $params): void
     {
         $adapter = $params['adapter'];
-        $routes = RouteGenerator::dynamicRoutes(100);
 
-        $adapter->initialize();
-        $adapter->registerRoutes($routes);
+        $this->bootAdapter($adapter);
 
-        $mid = $routes[50];
+        $mid = $this->routes[50];
         $adapter->dispatch($mid->method, $mid->testUri);
     }
 
     /**
-     * Dispatch the last dynamic route (worst case).
+     * Single request: dispatch the last dynamic route (worst case).
      */
     #[Bench\Revs(1000)]
     #[Bench\Iterations(5)]
     #[Bench\Warmup(2)]
     #[Bench\ParamProviders('provideAdapters')]
+    #[Bench\BeforeMethods(['setupDynamicRoutes100'])]
+    #[Bench\AfterMethods(['clearCache'])]
     public function benchLastDynamicRoute(array $params): void
     {
         $adapter = $params['adapter'];
-        $routes = RouteGenerator::dynamicRoutes(100);
 
-        $adapter->initialize();
-        $adapter->registerRoutes($routes);
+        $this->bootAdapter($adapter);
 
-        $last = $routes[array_key_last($routes)];
+        $last = $this->routes[array_key_last($this->routes)];
         $adapter->dispatch($last->method, $last->testUri);
     }
 
     /**
-     * Dispatch all 100 dynamic routes sequentially.
+     * 100 requests: dispatch each of 100 dynamic routes (boot per request).
      */
-    #[Bench\Revs(100)]
+    #[Bench\Revs(50)]
     #[Bench\Iterations(5)]
     #[Bench\Warmup(1)]
     #[Bench\ParamProviders('provideAdapters')]
+    #[Bench\BeforeMethods(['setupDynamicRoutes100'])]
+    #[Bench\AfterMethods(['clearCache'])]
     public function benchAllDynamicRoutes(array $params): void
     {
         $adapter = $params['adapter'];
-        $routes = RouteGenerator::dynamicRoutes(100);
 
-        $adapter->initialize();
-        $adapter->registerRoutes($routes);
-
-        foreach ($routes as $route) {
+        foreach ($this->routes as $route) {
+            $this->bootAdapter($adapter);
             $adapter->dispatch($route->method, $route->testUri);
         }
     }

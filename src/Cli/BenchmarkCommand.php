@@ -25,6 +25,15 @@ use WaypointBench\Adapter\WaypointAdapter;
 use WaypointBench\RouteSet\RouteDefinition;
 use WaypointBench\RouteSet\RouteGenerator;
 
+/**
+ * CLI benchmark command that measures real request-response lifecycle.
+ *
+ * Every scenario simulates production behavior:
+ * - Cacheable routers: cache is warmed once (setup), then each "request" loads from cache + dispatches
+ * - Non-cacheable routers: each "request" initializes + registers routes + dispatches
+ *
+ * All routers compete in every scenario on equal terms.
+ */
 #[AsCommand(
     name: 'benchmark',
     description: 'Run router benchmarks and display comparison table',
@@ -37,7 +46,7 @@ final class BenchmarkCommand extends Command
     {
         $this
             ->addOption('router', 'r', InputOption::VALUE_OPTIONAL, 'Comma-separated list of router names to test')
-            ->addOption('scenario', 's', InputOption::VALUE_OPTIONAL, 'Comma-separated list of scenarios (static,dynamic,registration,highload,cached)')
+            ->addOption('scenario', 's', InputOption::VALUE_OPTIONAL, 'Comma-separated list of scenarios (static,dynamic,highload)')
             ->addOption('runs', null, InputOption::VALUE_OPTIONAL, 'Number of runs per test (default: 20)', (string) self::DEFAULT_RUNS);
     }
 
@@ -49,37 +58,27 @@ final class BenchmarkCommand extends Command
         $io->title('Waypoint Router Benchmark');
         $io->text(\sprintf('PHP %s | %s | %s', PHP_VERSION, PHP_OS, date('Y-m-d H:i:s')));
         $io->text(\sprintf('Runs per test: %d (using median)', $runs));
+        $io->text('Each request = full router lifecycle (init/cache-load + dispatch)');
         $io->newLine();
 
         $adapters = $this->getAdapters($input);
         $scenarios = $this->getScenarios($input);
-
-        $isCachedScenario = static fn (string $name): bool => str_starts_with($name, 'Cached:');
 
         foreach ($scenarios as $scenarioName => $scenarioFn) {
             $io->section($scenarioName);
 
             $results = [];
 
-            // For cached scenarios, only include cacheable adapters
-            $scenarioAdapters = $isCachedScenario($scenarioName)
-                ? array_filter($adapters, static fn ($a) => $a instanceof CacheableAdapterInterface)
-                : $adapters;
+            $setupFn = $scenarioFn['setup'];
+            $runFn = $scenarioFn['run'];
+            $teardownFn = $scenarioFn['teardown'] ?? null;
 
-            // Scenario is either a Closure (simple) or an array with setup/run/teardown (cached)
-            $hasLifecycle = \is_array($scenarioFn);
-            $setupFn = $hasLifecycle ? $scenarioFn['setup'] : null;
-            $runFn = $hasLifecycle ? $scenarioFn['run'] : $scenarioFn;
-            $teardownFn = $hasLifecycle ? ($scenarioFn['teardown'] ?? null) : null;
-
-            foreach ($scenarioAdapters as $adapter) {
+            foreach ($adapters as $adapter) {
                 $name = $adapter->getName();
 
                 try {
-                    // Setup phase (e.g., warm cache) — outside timing loop
-                    if ($setupFn !== null) {
-                        $setupFn($adapter);
-                    }
+                    // Setup phase (warm cache) — outside timing loop
+                    $setupFn($adapter);
 
                     $timings = [];
                     $peakMemory = 0;
@@ -97,7 +96,7 @@ final class BenchmarkCommand extends Command
                         $peakMemory = max($peakMemory, $memAfter - $memBefore);
                     }
 
-                    // Teardown phase (e.g., clear cache) — after timing loop
+                    // Teardown phase (clear cache) — after timing loop
                     if ($teardownFn !== null) {
                         $teardownFn($adapter);
                     }
@@ -172,67 +171,42 @@ final class BenchmarkCommand extends Command
     }
 
     /**
-     * @return array<string, \Closure|array{setup: \Closure, run: \Closure, teardown?: \Closure}>
+     * @return array<string, array{setup: \Closure, run: \Closure, teardown?: \Closure}>
      */
     private function getScenarios(InputInterface $input): array
     {
         $all = [
             'static' => [
-                'Static Routes: Register 100, Dispatch First' => $this->scenarioDispatchFirst(
+                'Static Routes: 100 routes, dispatch first' => $this->scenarioDispatchFirst(
                     RouteGenerator::staticRoutes(100),
                 ),
-                'Static Routes: Register 100, Dispatch Last' => $this->scenarioDispatchLast(
+                'Static Routes: 100 routes, dispatch last' => $this->scenarioDispatchLast(
                     RouteGenerator::staticRoutes(100),
                 ),
-                'Static Routes: Register 100, Dispatch All' => $this->scenarioDispatchAll(
+                'Static Routes: 100 routes, dispatch all' => $this->scenarioDispatchAll(
                     RouteGenerator::staticRoutes(100),
                 ),
             ],
             'dynamic' => [
-                'Dynamic Routes: Register 100, Dispatch First' => $this->scenarioDispatchFirst(
+                'Dynamic Routes: 100 routes, dispatch first' => $this->scenarioDispatchFirst(
                     RouteGenerator::dynamicRoutes(100),
                 ),
-                'Dynamic Routes: Register 100, Dispatch Last' => $this->scenarioDispatchLast(
+                'Dynamic Routes: 100 routes, dispatch last' => $this->scenarioDispatchLast(
                     RouteGenerator::dynamicRoutes(100),
                 ),
-                'Dynamic Routes: Register 100, Dispatch All' => $this->scenarioDispatchAll(
+                'Dynamic Routes: 100 routes, dispatch all' => $this->scenarioDispatchAll(
                     RouteGenerator::dynamicRoutes(100),
-                ),
-            ],
-            'registration' => [
-                'Registration: 100 Static Routes' => $this->scenarioRegisterOnly(
-                    RouteGenerator::staticRoutes(100),
-                ),
-                'Registration: 500 Mixed Routes' => $this->scenarioRegisterOnly(
-                    RouteGenerator::mixedRoutes(500),
-                ),
-                'Registration: 1000 Mixed Routes' => $this->scenarioRegisterOnly(
-                    RouteGenerator::mixedRoutes(1000),
                 ),
             ],
             'highload' => [
-                'High-Load: 500 Mixed Routes, Dispatch All' => $this->scenarioDispatchAll(
+                'High-Load: 500 mixed routes, dispatch all' => $this->scenarioDispatchAll(
                     RouteGenerator::mixedRoutes(500),
                 ),
-                'High-Load: 100 Dynamic x50 Repeated' => $this->scenarioRepeatedDispatch(
+                'High-Load: 100 dynamic x50 repeated' => $this->scenarioRepeatedDispatch(
                     RouteGenerator::dynamicRoutes(100),
                     50,
                 ),
-                'Large-Scale: 1000 Mixed Routes, Dispatch All' => $this->scenarioDispatchAll(
-                    RouteGenerator::mixedRoutes(1000),
-                ),
-            ],
-            'cached' => [
-                'Cached: Load 100 Static + Dispatch All' => $this->scenarioCachedDispatchAll(
-                    RouteGenerator::staticRoutes(100),
-                ),
-                'Cached: Load 100 Dynamic + Dispatch All' => $this->scenarioCachedDispatchAll(
-                    RouteGenerator::dynamicRoutes(100),
-                ),
-                'Cached: Load 500 Mixed + Dispatch All' => $this->scenarioCachedDispatchAll(
-                    RouteGenerator::mixedRoutes(500),
-                ),
-                'Cached: Load 1000 Mixed + Dispatch All' => $this->scenarioCachedDispatchAll(
+                'Large-Scale: 1000 mixed routes, dispatch all' => $this->scenarioDispatchAll(
                     RouteGenerator::mixedRoutes(1000),
                 ),
             ],
@@ -256,113 +230,140 @@ final class BenchmarkCommand extends Command
         return $result;
     }
 
-    /**
-     * @param RouteDefinition[] $routes
-     */
-    private function scenarioDispatchFirst(array $routes): \Closure
-    {
-        return static function (AdapterInterface $adapter) use ($routes): void {
-            $adapter->initialize();
-            $adapter->registerRoutes($routes);
-
-            $first = $routes[0];
-            $adapter->dispatch($first->method, $first->testUri);
-        };
-    }
+    // ── Scenario builders ───────────────────────────────────────────────
 
     /**
-     * @param RouteDefinition[] $routes
-     */
-    private function scenarioDispatchLast(array $routes): \Closure
-    {
-        return static function (AdapterInterface $adapter) use ($routes): void {
-            $adapter->initialize();
-            $adapter->registerRoutes($routes);
-
-            $last = $routes[array_key_last($routes)];
-            $adapter->dispatch($last->method, $last->testUri);
-        };
-    }
-
-    /**
-     * @param RouteDefinition[] $routes
-     */
-    private function scenarioDispatchAll(array $routes): \Closure
-    {
-        return static function (AdapterInterface $adapter) use ($routes): void {
-            $adapter->initialize();
-            $adapter->registerRoutes($routes);
-
-            foreach ($routes as $route) {
-                $adapter->dispatch($route->method, $route->testUri);
-            }
-        };
-    }
-
-    /**
-     * @param RouteDefinition[] $routes
-     */
-    private function scenarioRegisterOnly(array $routes): \Closure
-    {
-        return static function (AdapterInterface $adapter) use ($routes): void {
-            $adapter->initialize();
-            $adapter->registerRoutes($routes);
-        };
-    }
-
-    /**
-     * @param RouteDefinition[] $routes
-     */
-    private function scenarioRepeatedDispatch(array $routes, int $repeats): \Closure
-    {
-        return static function (AdapterInterface $adapter) use ($routes, $repeats): void {
-            $adapter->initialize();
-            $adapter->registerRoutes($routes);
-
-            for ($i = 0; $i < $repeats; $i++) {
-                foreach ($routes as $route) {
-                    $adapter->dispatch($route->method, $route->testUri);
-                }
-            }
-        };
-    }
-
-    /**
-     * Cached scenario: warm cache once (setup), then load from cache + dispatch all (timed).
-     * Only runs for adapters implementing CacheableAdapterInterface.
+     * Single request: boot router + dispatch first route.
      *
      * @param RouteDefinition[] $routes
      * @return array{setup: \Closure, run: \Closure, teardown: \Closure}
      */
-    private function scenarioCachedDispatchAll(array $routes): array
+    private function scenarioDispatchFirst(array $routes): array
+    {
+        $cacheDir = $this->getCacheDir();
+        $first = $routes[0];
+
+        return [
+            'setup' => $this->makeSetup($routes, $cacheDir),
+            'run' => function (AdapterInterface $adapter) use ($routes, $cacheDir, $first): void {
+                $this->bootAdapter($adapter, $routes, $cacheDir);
+                $adapter->dispatch($first->method, $first->testUri);
+            },
+            'teardown' => $this->makeTeardown($cacheDir),
+        ];
+    }
+
+    /**
+     * Single request: boot router + dispatch last route.
+     *
+     * @param RouteDefinition[] $routes
+     * @return array{setup: \Closure, run: \Closure, teardown: \Closure}
+     */
+    private function scenarioDispatchLast(array $routes): array
+    {
+        $cacheDir = $this->getCacheDir();
+        $last = $routes[array_key_last($routes)];
+
+        return [
+            'setup' => $this->makeSetup($routes, $cacheDir),
+            'run' => function (AdapterInterface $adapter) use ($routes, $cacheDir, $last): void {
+                $this->bootAdapter($adapter, $routes, $cacheDir);
+                $adapter->dispatch($last->method, $last->testUri);
+            },
+            'teardown' => $this->makeTeardown($cacheDir),
+        ];
+    }
+
+    /**
+     * N requests: for each route — boot router + dispatch.
+     *
+     * @param RouteDefinition[] $routes
+     * @return array{setup: \Closure, run: \Closure, teardown: \Closure}
+     */
+    private function scenarioDispatchAll(array $routes): array
     {
         $cacheDir = $this->getCacheDir();
 
         return [
-            // Warm cache once before timing loop
-            'setup' => static function (AdapterInterface $adapter) use ($routes, $cacheDir): void {
-                if (!$adapter instanceof CacheableAdapterInterface) {
-                    throw new \RuntimeException('Not cacheable');
-                }
-                $adapter->warmCache($routes, $cacheDir);
-            },
-            // Timed: load from cache + dispatch (this runs N times)
-            'run' => static function (AdapterInterface $adapter) use ($routes, $cacheDir): void {
-                if (!$adapter instanceof CacheableAdapterInterface) {
-                    throw new \RuntimeException('Not cacheable');
-                }
-                $adapter->initializeFromCache($cacheDir);
+            'setup' => $this->makeSetup($routes, $cacheDir),
+            'run' => function (AdapterInterface $adapter) use ($routes, $cacheDir): void {
                 foreach ($routes as $route) {
+                    $this->bootAdapter($adapter, $routes, $cacheDir);
                     $adapter->dispatch($route->method, $route->testUri);
                 }
             },
-            // Clean up after all runs
-            'teardown' => static function (AdapterInterface $adapter) use ($cacheDir): void {
-                if ($adapter instanceof CacheableAdapterInterface) {
-                    $adapter->clearCache($cacheDir);
+            'teardown' => $this->makeTeardown($cacheDir),
+        ];
+    }
+
+    /**
+     * N * M requests: repeated dispatching of all routes (boot per request).
+     *
+     * @param RouteDefinition[] $routes
+     * @return array{setup: \Closure, run: \Closure, teardown: \Closure}
+     */
+    private function scenarioRepeatedDispatch(array $routes, int $repeats): array
+    {
+        $cacheDir = $this->getCacheDir();
+
+        return [
+            'setup' => $this->makeSetup($routes, $cacheDir),
+            'run' => function (AdapterInterface $adapter) use ($routes, $cacheDir, $repeats): void {
+                for ($i = 0; $i < $repeats; $i++) {
+                    foreach ($routes as $route) {
+                        $this->bootAdapter($adapter, $routes, $cacheDir);
+                        $adapter->dispatch($route->method, $route->testUri);
+                    }
                 }
             },
+            'teardown' => $this->makeTeardown($cacheDir),
         ];
+    }
+
+    // ── Lifecycle helpers ───────────────────────────────────────────────
+
+    /**
+     * Create a setup closure that warms cache for cacheable adapters.
+     *
+     * @param RouteDefinition[] $routes
+     */
+    private function makeSetup(array $routes, string $cacheDir): \Closure
+    {
+        return static function (AdapterInterface $adapter) use ($routes, $cacheDir): void {
+            if ($adapter instanceof CacheableAdapterInterface) {
+                $adapter->warmCache($routes, $cacheDir);
+            }
+        };
+    }
+
+    /**
+     * Create a teardown closure that clears cache for cacheable adapters.
+     */
+    private function makeTeardown(string $cacheDir): \Closure
+    {
+        return static function (AdapterInterface $adapter) use ($cacheDir): void {
+            if ($adapter instanceof CacheableAdapterInterface) {
+                $adapter->clearCache($cacheDir);
+            }
+        };
+    }
+
+    /**
+     * Boot the adapter for a single request.
+     *
+     * Cacheable adapters load from pre-warmed cache (fast path).
+     * Non-cacheable adapters initialize and register routes from scratch.
+     *
+     * @param RouteDefinition[] $routes
+     */
+    private function bootAdapter(AdapterInterface $adapter, array $routes, string $cacheDir): void
+    {
+        if ($adapter instanceof CacheableAdapterInterface) {
+            $adapter->initializeFromCache($cacheDir);
+        } else {
+            $adapter->initialize();
+            $adapter->registerRoutes($routes);
+        }
     }
 
     private function getCacheDir(): string

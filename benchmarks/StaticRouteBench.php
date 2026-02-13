@@ -5,69 +5,68 @@ declare(strict_types=1);
 namespace WaypointBench\Benchmarks;
 
 use PhpBench\Attributes as Bench;
-use WaypointBench\Adapter\AdapterInterface;
-use WaypointBench\RouteSet\RouteGenerator;
 
 /**
- * Benchmark: dispatching static routes (no parameters).
+ * Benchmark: real request lifecycle with static routes (no parameters).
+ *
+ * Each rev simulates a real HTTP request: boot router (from cache or fresh) + dispatch.
  */
 #[Bench\Groups(['static'])]
 class StaticRouteBench extends AbstractRouteBench
 {
     /**
-     * Dispatch the first static route out of 100 registered.
+     * Single request: dispatch the first static route out of 100.
      */
     #[Bench\Revs(1000)]
     #[Bench\Iterations(5)]
     #[Bench\Warmup(2)]
     #[Bench\ParamProviders('provideAdapters')]
+    #[Bench\BeforeMethods(['setupStaticRoutes100'])]
+    #[Bench\AfterMethods(['clearCache'])]
     public function benchFirstStaticRoute(array $params): void
     {
         $adapter = $params['adapter'];
-        $routes = RouteGenerator::staticRoutes(100);
 
-        $adapter->initialize();
-        $adapter->registerRoutes($routes);
+        $this->bootAdapter($adapter);
 
-        $first = $routes[0];
+        $first = $this->routes[0];
         $adapter->dispatch($first->method, $first->testUri);
     }
 
     /**
-     * Dispatch the last static route out of 100 registered (worst case).
+     * Single request: dispatch the last static route out of 100 (worst case).
      */
     #[Bench\Revs(1000)]
     #[Bench\Iterations(5)]
     #[Bench\Warmup(2)]
     #[Bench\ParamProviders('provideAdapters')]
+    #[Bench\BeforeMethods(['setupStaticRoutes100'])]
+    #[Bench\AfterMethods(['clearCache'])]
     public function benchLastStaticRoute(array $params): void
     {
         $adapter = $params['adapter'];
-        $routes = RouteGenerator::staticRoutes(100);
 
-        $adapter->initialize();
-        $adapter->registerRoutes($routes);
+        $this->bootAdapter($adapter);
 
-        $last = $routes[array_key_last($routes)];
+        $last = $this->routes[array_key_last($this->routes)];
         $adapter->dispatch($last->method, $last->testUri);
     }
 
     /**
-     * Dispatch all 100 static routes sequentially.
+     * 100 requests: dispatch each of 100 static routes (boot per request).
      */
-    #[Bench\Revs(100)]
+    #[Bench\Revs(50)]
     #[Bench\Iterations(5)]
     #[Bench\Warmup(1)]
     #[Bench\ParamProviders('provideAdapters')]
+    #[Bench\BeforeMethods(['setupStaticRoutes100'])]
+    #[Bench\AfterMethods(['clearCache'])]
     public function benchAllStaticRoutes(array $params): void
     {
         $adapter = $params['adapter'];
-        $routes = RouteGenerator::staticRoutes(100);
 
-        $adapter->initialize();
-        $adapter->registerRoutes($routes);
-
-        foreach ($routes as $route) {
+        foreach ($this->routes as $route) {
+            $this->bootAdapter($adapter);
             $adapter->dispatch($route->method, $route->testUri);
         }
     }
