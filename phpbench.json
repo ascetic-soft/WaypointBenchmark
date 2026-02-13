@@ -1,0 +1,13 @@
+{
+    "runner.bootstrap": "vendor/autoload.php",
+    "runner.path": "benchmarks",
+    "runner.iterations": 5,
+    "runner.revs": 1000,
+    "runner.warmup": 2,
+    "report.generators": {
+        "all": {
+            "generator": "composite",
+            "reports": ["aggregate", "env"]
+        }
+    }
+}

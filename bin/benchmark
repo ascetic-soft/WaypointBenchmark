@@ -1,0 +1,15 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+require __DIR__ . '/../vendor/autoload.php';
+
+use Symfony\Component\Console\Application;
+use WaypointBench\Cli\BenchmarkCommand;
+
+$application = new Application('Waypoint Router Benchmark', '1.0.0');
+$command = new BenchmarkCommand();
+$application->add($command);
+$application->setDefaultCommand('benchmark', true);
+$application->run();

@@ -1,0 +1,42 @@
+{
+    "name": "ascetic-soft/waypoint-benchmark",
+    "description": "Benchmark suite comparing Waypoint router against popular PHP routing libraries",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.4",
+        "ext-mbstring": "*",
+        "ascetic-soft/waypoint": "^1.0",
+        "nikic/fast-route": "^1.3",
+        "symfony/routing": "^7.2",
+        "illuminate/routing": "^11.0",
+        "illuminate/events": "^11.0",
+        "illuminate/container": "^11.0",
+        "league/route": "^6.0",
+        "nette/routing": "^3.1",
+        "bramus/router": "^1.6",
+        "altorouter/altorouter": "^2.0",
+        "phroute/phroute": "^2.2",
+        "nyholm/psr7": "^1.8",
+        "symfony/console": "^7.0"
+    },
+    "require-dev": {
+        "phpbench/phpbench": "^1.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "WaypointBench\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "WaypointBench\\Benchmarks\\": "benchmarks/"
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "phpbench/phpbench": true
+        }
+    }
+}
