@@ -6,8 +6,8 @@ namespace WaypointBench\Adapter;
 
 use League\Route\Router;
 use League\Route\Strategy\ApplicationStrategy;
-use Nyholm\Psr7\Factory\Psr17Factory;
-use Nyholm\Psr7\ServerRequest;
+use AsceticSoft\Psr7\HttpFactory;
+use AsceticSoft\Psr7\ServerRequest;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use WaypointBench\Support\SimpleContainer;
@@ -15,7 +15,7 @@ use WaypointBench\Support\SimpleContainer;
 final class LeagueAdapter implements AdapterInterface
 {
     private Router $router;
-    private Psr17Factory $psr17Factory;
+    private HttpFactory $psr17Factory;
 
     public function getName(): string
     {
@@ -24,7 +24,7 @@ final class LeagueAdapter implements AdapterInterface
 
     public function initialize(): void
     {
-        $this->psr17Factory = new Psr17Factory();
+        $this->psr17Factory = new HttpFactory();
         $strategy = new ApplicationStrategy();
         $strategy->setContainer(new SimpleContainer());
 

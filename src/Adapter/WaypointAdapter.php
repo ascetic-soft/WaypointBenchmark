@@ -4,17 +4,16 @@ declare(strict_types=1);
 
 namespace WaypointBench\Adapter;
 
-use AsceticSoft\Waypoint\Router;
-use Nyholm\Psr7\Factory\Psr17Factory;
-use Nyholm\Psr7\ServerRequest;
+use AsceticSoft\Waypoint\Cache\RouteCompiler;
+use AsceticSoft\Waypoint\RouteRegistrar;
+use AsceticSoft\Waypoint\TrieMatcher;
+use AsceticSoft\Waypoint\UrlMatcherInterface;
 use WaypointBench\Handler\BenchmarkHandler;
-use WaypointBench\Support\SimpleContainer;
 
 final class WaypointAdapter implements AdapterInterface, CacheableAdapterInterface
 {
-    private Router $router;
-    private Psr17Factory $psr17Factory;
-    private SimpleContainer $container;
+    private RouteRegistrar $registrar;
+    private ?UrlMatcherInterface $matcher = null;
 
     private const string CACHE_FILE = 'waypoint_routes.php';
 
@@ -25,73 +24,75 @@ final class WaypointAdapter implements AdapterInterface, CacheableAdapterInterfa
 
     public function initialize(): void
     {
-        $this->container = new SimpleContainer();
-        $this->psr17Factory = new Psr17Factory();
-        $this->router = new Router($this->container);
+        $this->registrar = new RouteRegistrar();
+        $this->matcher = null;
     }
 
     public function registerRoutes(array $routes): void
     {
-        $factory = $this->psr17Factory;
-
         foreach ($routes as $route) {
             $handler = $route->handler;
-            $closure = static function () use ($factory, $handler) {
-                $response = $factory->createResponse(200);
-                $response->getBody()->write($handler);
 
-                return $response;
-            };
-
-            $this->router->addRoute(
+            $this->registrar->addRoute(
                 path: $route->pattern,
-                handler: $closure,
+                handler: static fn(): string => $handler,
                 methods: [$route->method],
             );
         }
+
+        $this->matcher = new TrieMatcher($this->registrar->getRouteCollection());
     }
 
     public function dispatch(string $method, string $uri): string
     {
-        $request = new ServerRequest($method, $uri);
-        $response = $this->router->handle($request);
+        $result = $this->matcher->match($method, $uri);
+        $handler = $result->route->getHandler();
 
-        return (string) $response->getBody();
+        if ($handler instanceof \Closure) {
+            return $handler();
+        }
+
+        [$className, $methodName] = $handler;
+        $instance = new $className();
+
+        return $instance->$methodName();
     }
 
     // --- CacheableAdapterInterface ---
 
     public function warmCache(array $routes, string $cacheDir): void
     {
-        $container = new SimpleContainer();
-        $factory = new Psr17Factory();
-        $container->set(BenchmarkHandler::class, new BenchmarkHandler($factory));
-
-        $router = new Router($container);
+        $registrar = new RouteRegistrar();
 
         foreach ($routes as $route) {
-            $router->addRoute(
+            $registrar->addRoute(
                 path: $route->pattern,
                 handler: [BenchmarkHandler::class, 'handle'],
                 methods: [$route->method],
             );
         }
 
-        $router->compileTo($cacheDir . '/' . self::CACHE_FILE);
+        $compiler = new RouteCompiler();
+        $compiler->compile(
+            $registrar->getRouteCollection(),
+            $cacheDir . '/' . self::CACHE_FILE,
+        );
     }
 
     public function initializeFromCache(string $cacheDir): void
     {
-        $this->container = new SimpleContainer();
-        $this->psr17Factory = new Psr17Factory();
-        $this->container->set(BenchmarkHandler::class, new BenchmarkHandler($this->psr17Factory));
+        if ($this->matcher !== null) {
+            return;
+        }
 
-        $this->router = new Router($this->container);
-        $this->router->loadCache($cacheDir . '/' . self::CACHE_FILE);
+        $compiler = new RouteCompiler();
+        $this->matcher = $compiler->load($cacheDir . '/' . self::CACHE_FILE);
     }
 
     public function clearCache(string $cacheDir): void
     {
+        $this->matcher = null;
+
         $file = $cacheDir . '/' . self::CACHE_FILE;
         if (file_exists($file)) {
             unlink($file);

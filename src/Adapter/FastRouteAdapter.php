@@ -65,6 +65,10 @@ final class FastRouteAdapter implements AdapterInterface, CacheableAdapterInterf
 
     public function initializeFromCache(string $cacheDir): void
     {
+        if (isset($this->dispatcher)) {
+            return;
+        }
+
         $cacheFile = $cacheDir . '/' . self::CACHE_FILE;
 
         // Load from existing cache — the callback is a no-op since cache exists
@@ -78,6 +82,8 @@ final class FastRouteAdapter implements AdapterInterface, CacheableAdapterInterf
 
     public function clearCache(string $cacheDir): void
     {
+        unset($this->dispatcher);
+
         $file = $cacheDir . '/' . self::CACHE_FILE;
         if (file_exists($file)) {
             unlink($file);

@@ -73,6 +73,10 @@ final class SymfonyAdapter implements AdapterInterface, CacheableAdapterInterfac
 
     public function initializeFromCache(string $cacheDir): void
     {
+        if (isset($this->matcher)) {
+            return;
+        }
+
         $this->context = new RequestContext();
         $compiledRoutes = require $cacheDir . '/' . self::CACHE_FILE;
 
@@ -81,6 +85,8 @@ final class SymfonyAdapter implements AdapterInterface, CacheableAdapterInterfac
 
     public function clearCache(string $cacheDir): void
     {
+        unset($this->matcher);
+
         $file = $cacheDir . '/' . self::CACHE_FILE;
         if (file_exists($file)) {
             unlink($file);
