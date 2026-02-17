@@ -53,9 +53,7 @@ final class WaypointAdapter implements AdapterInterface, CacheableAdapterInterfa
         }
 
         [$className, $methodName] = $handler;
-        $instance = new $className();
-
-        return $instance->$methodName();
+        return (new $className())->$methodName();
     }
 
     // --- CacheableAdapterInterface ---
