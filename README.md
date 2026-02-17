@@ -111,43 +111,43 @@ make all          # Install + benchmark
 
 | Rank | Router | Time (ms) | vs Fastest |
 |------|--------|-----------|------------|
-| 1 | FastRoute | 0.017 | 100% |
-| 2 | Symfony | 0.090 | 543% |
-| 3 | AltoRouter | 0.887 | 5,336% |
-| 4 | Bramus | 1.405 | 8,450% |
-| 5 | **Waypoint** | **1.847** | **11,114%** |
-| 6 | PHRoute | 4.625 | 27,820% |
-| 7 | Nette | 8.983 | 54,041% |
-| 8 | League | 13.584 | 81,718% |
-| 9 | Laravel | 40.617 | 244,341% |
+| 1 | FastRoute | 0.015 | 100% |
+| 2 | Symfony | 0.089 | 577% |
+| 3 | AltoRouter | 0.868 | 5,623% |
+| 4 | Bramus | 1.418 | 9,185% |
+| 5 | **Waypoint** | **1.726** | **11,185%** |
+| 6 | PHRoute | 4.631 | 30,000% |
+| 7 | Nette | 8.978 | 58,169% |
+| 8 | League | 13.531 | 87,662% |
+| 9 | Laravel | 40.256 | 260,808% |
 
 **Dispatch last route (worst case)**
 
 | Rank | Router | Time (ms) | vs Fastest |
 |------|--------|-----------|------------|
 | 1 | FastRoute | 0.014 | 100% |
-| 2 | AltoRouter | 0.822 | 5,767% |
-| 3 | Symfony | 0.867 | 6,083% |
-| 4 | **Waypoint** | **0.914** | **6,417%** |
-| 5 | Bramus | 1.629 | 11,433% |
-| 6 | PHRoute | 2.611 | 18,325% |
-| 7 | Nette | 5.114 | 35,891% |
-| 8 | League | 6.182 | 43,391% |
-| 9 | Laravel | 21.952 | 154,072% |
+| 2 | **Waypoint** | **0.775** | **5,442%** |
+| 3 | AltoRouter | 0.830 | 5,825% |
+| 4 | Symfony | 0.870 | 6,108% |
+| 5 | Bramus | 1.641 | 11,516% |
+| 6 | PHRoute | 2.643 | 18,550% |
+| 7 | Nette | 5.102 | 35,808% |
+| 8 | League | 6.197 | 43,491% |
+| 9 | Laravel | 21.750 | 152,655% |
 
 **Dispatch all 100 routes (100 requests)**
 
 | Rank | Router | Time (ms) | vs Fastest |
 |------|--------|-----------|------------|
-| 1 | FastRoute | 0.560 | 100% |
-| 2 | **Waypoint** | **2.860** | **510%** |
-| 3 | Symfony | 38.305 | 6,835% |
-| 4 | AltoRouter | 49.076 | 8,757% |
-| 5 | Bramus | 73.076 | 13,040% |
-| 6 | PHRoute | 219.846 | 39,229% |
-| 7 | Nette | 314.912 | 56,193% |
-| 8 | League | 520.646 | 92,904% |
-| 9 | Laravel | 1,435.471 | 256,146% |
+| 1 | FastRoute | 0.647 | 100% |
+| 2 | **Waypoint** | **3.392** | **524%** |
+| 3 | Symfony | 43.686 | 6,751% |
+| 4 | AltoRouter | 49.771 | 7,692% |
+| 5 | Bramus | 73.462 | 11,353% |
+| 6 | PHRoute | 220.430 | 34,065% |
+| 7 | Nette | 315.656 | 48,781% |
+| 8 | League | 517.895 | 80,035% |
+| 9 | Laravel | 1,445.123 | 223,329% |
 
 ### 2. Dynamic Route Dispatching
 
@@ -157,43 +157,43 @@ make all          # Install + benchmark
 
 | Rank | Router | Time (ms) | vs Fastest |
 |------|--------|-----------|------------|
-| 1 | Symfony | 0.077 | 100% |
-| 2 | FastRoute | 0.095 | 123% |
-| 3 | AltoRouter | 0.361 | 468% |
-| 4 | Bramus | 0.514 | 666% |
-| 5 | **Waypoint** | **0.682** | **883%** |
-| 6 | Nette | 4.281 | 5,548% |
-| 7 | PHRoute | 6.149 | 7,968% |
-| 8 | League | 7.384 | 9,568% |
-| 9 | Laravel | 10.954 | 14,194% |
+| 1 | Symfony | 0.080 | 100% |
+| 2 | FastRoute | 0.132 | 166% |
+| 3 | AltoRouter | 0.368 | 463% |
+| 4 | Bramus | 0.514 | 646% |
+| 5 | **Waypoint** | **0.632** | **794%** |
+| 6 | Nette | 4.341 | 5,457% |
+| 7 | PHRoute | 6.181 | 7,770% |
+| 8 | League | 7.353 | 9,243% |
+| 9 | Laravel | 10.738 | 13,498% |
 
 **Dispatch last route (worst case)**
 
 | Rank | Router | Time (ms) | vs Fastest |
 |------|--------|-----------|------------|
-| 1 | FastRoute | 0.386 | 100% |
-| 2 | **Waypoint** | **0.628** | **163%** |
-| 3 | Symfony | 0.762 | 198% |
-| 4 | Bramus | 1.458 | 378% |
-| 5 | AltoRouter | 1.926 | 499% |
-| 6 | Nette | 6.372 | 1,651% |
-| 7 | PHRoute | 6.705 | 1,738% |
-| 8 | League | 7.794 | 2,020% |
-| 9 | Laravel | 21.981 | 5,696% |
+| 1 | FastRoute | 0.459 | 100% |
+| 2 | **Waypoint** | **0.493** | **107%** |
+| 3 | Symfony | 0.752 | 164% |
+| 4 | Bramus | 1.458 | 317% |
+| 5 | AltoRouter | 1.910 | 416% |
+| 6 | Nette | 6.465 | 1,407% |
+| 7 | PHRoute | 6.647 | 1,447% |
+| 8 | League | 7.570 | 1,648% |
+| 9 | Laravel | 22.464 | 4,889% |
 
 **Dispatch all 100 routes (100 requests)**
 
 | Rank | Router | Time (ms) | vs Fastest |
 |------|--------|-----------|------------|
-| 1 | FastRoute | 1.678 | 100% |
-| 2 | **Waypoint** | **4.365** | **260%** |
-| 3 | Symfony | 38.268 | 2,281% |
-| 4 | Bramus | 75.663 | 4,510% |
-| 5 | AltoRouter | 85.444 | 5,093% |
-| 6 | Nette | 490.442 | 29,233% |
-| 7 | PHRoute | 605.919 | 36,117% |
-| 8 | League | 741.033 | 44,170% |
-| 9 | Laravel | 1,595.953 | 95,129% |
+| 1 | FastRoute | 1.472 | 100% |
+| 2 | **Waypoint** | **3.989** | **271%** |
+| 3 | Symfony | 37.537 | 2,550% |
+| 4 | Bramus | 74.165 | 5,037% |
+| 5 | AltoRouter | 86.562 | 5,880% |
+| 6 | Nette | 489.341 | 33,237% |
+| 7 | PHRoute | 608.800 | 41,351% |
+| 8 | League | 733.960 | 49,852% |
+| 9 | Laravel | 1,635.078 | 111,059% |
 
 ### 3. High-Load and Large-Scale
 
@@ -203,43 +203,43 @@ Each "request" = boot router from scratch or from cache + dispatch. The router i
 
 | Rank | Router | Time (ms) | vs Fastest |
 |------|--------|-----------|------------|
-| 1 | FastRoute | 8.838 | 100% |
-| 2 | **Waypoint** | **17.129** | **194%** |
-| 3 | Symfony | 843.766 | 9,547% |
-| 4 | AltoRouter | 1,433.117 | 16,215% |
-| 5 | Bramus | 1,780.217 | 20,142% |
-| 6 | Nette | 10,009.903 | 113,255% |
-| 7 | PHRoute | 10,262.511 | 116,113% |
-| 8 | League | 15,432.601 | 174,609% |
-| 9 | Laravel | 35,289.225 | 399,274% |
+| 1 | FastRoute | 8.826 | 100% |
+| 2 | **Waypoint** | **16.813** | **190%** |
+| 3 | Symfony | 844.556 | 9,568% |
+| 4 | AltoRouter | 1,433.410 | 16,240% |
+| 5 | Bramus | 1,796.941 | 20,359% |
+| 6 | Nette | 10,049.220 | 113,853% |
+| 7 | PHRoute | 10,291.982 | 116,604% |
+| 8 | League | 15,408.548 | 174,572% |
+| 9 | Laravel | 35,349.927 | 400,500% |
 
 **100 dynamic routes x50 repeated dispatch (5,000 requests)**
 
 | Rank | Router | Time (ms) | vs Fastest |
 |------|--------|-----------|------------|
-| 1 | FastRoute | 80.392 | 100% |
-| 2 | **Waypoint** | **151.700** | **189%** |
-| 3 | Symfony | 1,851.921 | 2,304% |
-| 4 | Bramus | 3,701.786 | 4,605% |
-| 5 | AltoRouter | 4,315.213 | 5,368% |
-| 6 | Nette | 24,566.455 | 30,558% |
-| 7 | PHRoute | 30,447.787 | 37,874% |
-| 8 | League | 36,814.857 | 45,794% |
-| 9 | Laravel | 80,220.752 | 99,787% |
+| 1 | FastRoute | 80.728 | 100% |
+| 2 | **Waypoint** | **147.307** | **182%** |
+| 3 | Symfony | 1,855.242 | 2,298% |
+| 4 | Bramus | 3,683.131 | 4,562% |
+| 5 | AltoRouter | 4,249.115 | 5,264% |
+| 6 | Nette | 23,996.369 | 29,725% |
+| 7 | PHRoute | 30,020.653 | 37,188% |
+| 8 | League | 36,949.284 | 45,770% |
+| 9 | Laravel | 79,991.495 | 99,088% |
 
 **1,000 mixed routes — dispatch all (1,000 requests)**
 
 | Rank | Router | Time (ms) | vs Fastest |
 |------|--------|-----------|------------|
-| 1 | FastRoute | 27.018 | 100% |
-| 2 | **Waypoint** | **34.351** | **127%** |
-| 3 | Symfony | 3,324.234 | 12,304% |
-| 4 | AltoRouter | 5,567.821 | 20,607% |
-| 5 | Bramus | 6,921.092 | 25,616% |
-| 6 | Nette | 39,983.556 | 147,986% |
-| 7 | PHRoute | 41,047.135 | 151,923% |
-| 8 | League | 61,716.880 | 228,425% |
-| 9 | Laravel | 140,164.887 | 518,775% |
+| 1 | FastRoute | 25.876 | 100% |
+| 2 | **Waypoint** | **33.875** | **131%** |
+| 3 | Symfony | 3,274.968 | 12,656% |
+| 4 | AltoRouter | 5,649.211 | 21,832% |
+| 5 | Bramus | 7,093.965 | 27,415% |
+| 6 | Nette | 40,297.732 | 155,733% |
+| 7 | PHRoute | 41,488.658 | 160,335% |
+| 8 | League | 61,764.349 | 238,692% |
+| 9 | Laravel | 140,604.369 | 543,373% |
 
 ---
 
@@ -250,23 +250,23 @@ Each "request" = boot router from scratch or from cache + dispatch. The router i
 Based on full request lifecycle (boot + dispatch), where cacheable routers use their cache:
 
 **Tier 1 — Fastest request handling** (compiled cache pays off):
-- **FastRoute** — overall fastest in almost every scenario. `cachedDispatcher()` loads compiled regex data from a PHP file, making cold and cached performance nearly identical. 0.017 ms per request at 100 static routes.
-- **Waypoint** — prefix-trie matching with cache support. **Solidly 2nd place in all "dispatch all" and high-load scenarios.** At 1,000 mixed routes, only 27% slower than FastRoute (34.4 ms vs 27.0 ms). Proves that a cached prefix-trie can compete directly with compiled regex at scale. In this benchmark, Waypoint uses its core trie matcher directly (without PSR-15 middleware pipeline), just like FastRoute and Symfony use their core matchers.
+- **FastRoute** — overall fastest in almost every scenario. `cachedDispatcher()` loads compiled regex data from a PHP file, making cold and cached performance nearly identical. 0.015 ms per request at 100 static routes.
+- **Waypoint** — prefix-trie matching with cache support. **Solidly 2nd place in all "dispatch all" and high-load scenarios.** At 1,000 mixed routes, only 31% slower than FastRoute (33.9 ms vs 25.9 ms). Proves that a cached prefix-trie can compete directly with compiled regex at scale. In this benchmark, Waypoint uses its core trie matcher directly (without PSR-15 middleware pipeline), just like FastRoute and Symfony use their core matchers.
 
 **Tier 2 — Cached mid-range** (strong single-dispatch, but falls behind at scale):
-- **Symfony** — `CompiledUrlMatcher` performs well for single dispatches (1st in dynamic first-route at 0.077 ms), but drops to 3rd in all multi-dispatch scenarios. At 1,000 mixed routes, 123× slower than FastRoute (3,324 ms vs 27 ms). Wins 1st place in dynamic first-route dispatch, beating FastRoute (0.077 ms vs 0.095 ms).
+- **Symfony** — `CompiledUrlMatcher` performs well for single dispatches (1st in dynamic first-route at 0.080 ms), but drops to 3rd in all multi-dispatch scenarios. At 1,000 mixed routes, 127× slower than FastRoute (3,275 ms vs 26 ms). Wins 1st place in dynamic first-route dispatch, beating FastRoute (0.080 ms vs 0.132 ms).
 
 **Tier 3 — Lightweight routers** (fast single dispatch, O(n) scaling):
-- **AltoRouter** — fast at small scale (2nd in static last-route), but linear O(n) matching causes dramatic slowdown at scale. At 1,000 mixed routes: 5,568 ms (206× FastRoute).
-- **Bramus** — similar pattern to AltoRouter. Fast single-route dispatch but O(n) scaling costs it dearly: 6,921 ms at 1,000 mixed routes (256× FastRoute).
+- **AltoRouter** — fast at small scale (3rd in static last-route), but linear O(n) matching causes dramatic slowdown at scale. At 1,000 mixed routes: 5,649 ms (218× FastRoute).
+- **Bramus** — similar pattern to AltoRouter. Fast single-route dispatch but O(n) scaling costs it dearly: 7,094 ms at 1,000 mixed routes (274× FastRoute).
 
 **Tier 4 — Non-cached mid-range**:
-- **PHRoute** — built on FastRoute's core but no caching, so it pays full `simpleDispatcher()` cost per request. 1,738–151,923% of FastRoute depending on scenario.
-- **Nette** — no caching, O(n) matching. 1,651–147,986% of FastRoute at scale.
+- **PHRoute** — built on FastRoute's core but no caching, so it pays full `simpleDispatcher()` cost per request. 1,447–160,335% of FastRoute depending on scenario.
+- **Nette** — no caching, O(n) matching. 1,407–155,733% of FastRoute at scale.
 
 **Tier 5 — Heavy bootstrap**:
-- **League** — PSR-15, no caching. 2,020–228,425% of FastRoute at high load.
-- **Laravel** — heaviest bootstrap. 5,696–518,775% of FastRoute. Carries full framework routing infrastructure (Container, Dispatcher, Events).
+- **League** — PSR-15, no caching. 1,648–238,692% of FastRoute at high load.
+- **Laravel** — heaviest bootstrap. 4,889–543,373% of FastRoute. Carries full framework routing infrastructure (Container, Dispatcher, Events).
 
 ### Key Findings
 
@@ -276,10 +276,10 @@ FastRoute with `cachedDispatcher` wins most single-dispatch tests. Its cache loa
 
 | Scenario | FastRoute | 2nd place | Gap |
 |----------|-----------|-----------|-----|
-| 100 static, first | 0.017 ms | Symfony 0.090 ms | 5.3× |
-| 100 static, last | 0.014 ms | AltoRouter 0.822 ms | 58.7× |
-| 100 dynamic, first | 0.095 ms | Symfony 0.077 ms | Symfony wins |
-| 100 dynamic, last | 0.386 ms | Waypoint 0.628 ms | 1.6× |
+| 100 static, first | 0.015 ms | Symfony 0.089 ms | 5.9× |
+| 100 static, last | 0.014 ms | Waypoint 0.775 ms | 55.4× |
+| 100 dynamic, first | 0.132 ms | Symfony 0.080 ms | Symfony wins |
+| 100 dynamic, last | 0.459 ms | Waypoint 0.493 ms | 1.1× |
 
 #### 2. Waypoint takes 2nd place in every multi-dispatch scenario
 
@@ -287,25 +287,25 @@ In all "dispatch all" and high-load scenarios, Waypoint is **consistently 2nd**,
 
 | Scenario | FastRoute | **Waypoint** | 3rd place | Waypoint vs FastRoute |
 |----------|-----------|-------------|-----------|----------------------|
-| 100 static, all | 0.560 ms | **2.860 ms** | Symfony 38.3 ms | 5.1× |
-| 100 dynamic, all | 1.678 ms | **4.365 ms** | Symfony 38.3 ms | 2.6× |
-| 500 mixed, all | 8.838 ms | **17.129 ms** | Symfony 843.8 ms | 1.9× |
-| 100x50 repeated | 80.392 ms | **151.700 ms** | Symfony 1,851.9 ms | 1.9× |
-| 1000 mixed, all | 27.018 ms | **34.351 ms** | Symfony 3,324.2 ms | **1.3×** |
+| 100 static, all | 0.647 ms | **3.392 ms** | Symfony 43.7 ms | 5.2× |
+| 100 dynamic, all | 1.472 ms | **3.989 ms** | Symfony 37.5 ms | 2.7× |
+| 500 mixed, all | 8.826 ms | **16.813 ms** | Symfony 844.6 ms | 1.9× |
+| 100x50 repeated | 80.728 ms | **147.307 ms** | Symfony 1,855.2 ms | 1.8× |
+| 1000 mixed, all | 25.876 ms | **33.875 ms** | Symfony 3,275.0 ms | **1.3×** |
 
-At 1,000 mixed routes, Waypoint is only **27% slower** than FastRoute. The gap narrows as route count grows: from 5.1× at 100 static routes down to just 1.3× at 1,000 mixed routes.
+At 1,000 mixed routes, Waypoint is only **31% slower** than FastRoute. The gap narrows as route count grows: from 5.2× at 100 static routes down to just 1.3× at 1,000 mixed routes.
 
 #### 3. Waypoint leapfrogs Symfony at scale
 
-In single-dispatch tests, Symfony's `CompiledUrlMatcher` competes well (winning 1st place in dynamic first-route dispatch at 0.077 ms). But in multi-dispatch scenarios, Waypoint dramatically outperforms Symfony:
+In single-dispatch tests, Symfony's `CompiledUrlMatcher` competes well (winning 1st place in dynamic first-route dispatch at 0.080 ms). But in multi-dispatch scenarios, Waypoint dramatically outperforms Symfony:
 
 | Scenario | Waypoint | Symfony | Waypoint advantage |
 |----------|----------|---------|-------------------|
-| 100 static, all | 2.860 ms | 38.305 ms | **13.4× faster** |
-| 100 dynamic, all | 4.365 ms | 38.268 ms | **8.8× faster** |
-| 500 mixed, all | 17.129 ms | 843.766 ms | **49.3× faster** |
-| 100x50 repeated | 151.700 ms | 1,851.921 ms | **12.2× faster** |
-| 1000 mixed, all | 34.351 ms | 3,324.234 ms | **96.8× faster** |
+| 100 static, all | 3.392 ms | 43.686 ms | **12.9× faster** |
+| 100 dynamic, all | 3.989 ms | 37.537 ms | **9.4× faster** |
+| 500 mixed, all | 16.813 ms | 844.556 ms | **50.2× faster** |
+| 100x50 repeated | 147.307 ms | 1,855.242 ms | **12.6× faster** |
+| 1000 mixed, all | 33.875 ms | 3,274.968 ms | **96.7× faster** |
 
 At 1,000 routes, Waypoint is nearly **97× faster** than Symfony. This demonstrates that Waypoint's cached prefix-trie is fundamentally more efficient for repeated dispatches than Symfony's compiled URL matcher.
 
@@ -315,13 +315,13 @@ The prefix-trie data structure gives Waypoint a massive structural advantage ove
 
 | Scenario | Waypoint | AltoRouter | Bramus |
 |----------|----------|------------|--------|
-| 100 static, all | **2.860 ms (2nd)** | 49.076 ms (4th) | 73.076 ms (5th) |
-| 100 dynamic, all | **4.365 ms (2nd)** | 85.444 ms (5th) | 75.663 ms (4th) |
-| 500 mixed, all | **17.129 ms (2nd)** | 1,433.117 ms (4th) | 1,780.217 ms (5th) |
-| 100x50 repeated | **151.700 ms (2nd)** | 4,315.213 ms (5th) | 3,701.786 ms (4th) |
-| 1000 mixed, all | **34.351 ms (2nd)** | 5,567.821 ms (4th) | 6,921.092 ms (5th) |
+| 100 static, all | **3.392 ms (2nd)** | 49.771 ms (4th) | 73.462 ms (5th) |
+| 100 dynamic, all | **3.989 ms (2nd)** | 86.562 ms (5th) | 74.165 ms (4th) |
+| 500 mixed, all | **16.813 ms (2nd)** | 1,433.410 ms (4th) | 1,796.941 ms (5th) |
+| 100x50 repeated | **147.307 ms (2nd)** | 4,249.115 ms (5th) | 3,683.131 ms (4th) |
+| 1000 mixed, all | **33.875 ms (2nd)** | 5,649.211 ms (4th) | 7,093.965 ms (5th) |
 
-At 1,000 routes, Waypoint is **162× faster** than AltoRouter and **201× faster** than Bramus. The O(n) matchers' dispatch time scales linearly with route count, while Waypoint's trie-based cache provides near-constant-time lookups.
+At 1,000 routes, Waypoint is **167× faster** than AltoRouter and **209× faster** than Bramus. The O(n) matchers' dispatch time scales linearly with route count, while Waypoint's trie-based cache provides near-constant-time lookups.
 
 #### 5. Waypoint vs League: trie matcher vs PSR-7 pipeline
 
@@ -329,20 +329,20 @@ League is the only router in this benchmark that creates real PSR-7 Request/Resp
 
 | Scenario | Waypoint | League | Gap |
 |----------|----------|--------|-----|
-| 100 static, first | 1.847 ms | 13.584 ms | 7.4× faster |
-| 100 dynamic, all | 4.365 ms | 741.033 ms | 169.8× faster |
-| 500 mixed, all | 17.129 ms | 15,432.601 ms | 901.2× faster |
-| 1000 mixed, all | 34.351 ms | 61,716.880 ms | **1,796.7× faster** |
+| 100 static, first | 1.726 ms | 13.531 ms | 7.8× faster |
+| 100 dynamic, all | 3.989 ms | 733.960 ms | 184.0× faster |
+| 500 mixed, all | 16.813 ms | 15,408.548 ms | 916.5× faster |
+| 1000 mixed, all | 33.875 ms | 61,764.349 ms | **1,823.2× faster** |
 
 The gap is partly explained by League's PSR-7 overhead (creating `ServerRequest`/`Response` on every dispatch) and partly by the lack of caching — League reinitializes and re-registers all routes on every request.
 
-#### 6. Dynamic last-route dispatch: Waypoint takes 2nd place
+#### 6. Dynamic last-route dispatch: Waypoint nearly matches FastRoute
 
-In dynamic last-route dispatch (the worst-case scenario for route matching), Waypoint takes **2nd place** at 0.628 ms — beating Symfony (0.762 ms), Bramus (1.458 ms), and AltoRouter (1.926 ms). This confirms that the prefix-trie provides consistently fast lookups regardless of route position, unlike O(n) matchers where last-route performance degrades.
+In dynamic last-route dispatch (the worst-case scenario for route matching), Waypoint takes **2nd place** at 0.493 ms — only 7% behind FastRoute (0.459 ms) and beating Symfony (0.752 ms), Bramus (1.458 ms), and AltoRouter (1.910 ms). This confirms that the prefix-trie provides consistently fast lookups regardless of route position, unlike O(n) matchers where last-route performance degrades.
 
 #### 7. Laravel is consistently last
 
-Laravel's full-framework routing infrastructure makes it the heaviest router. A single request with 100 static routes takes 40.6 ms — 2,389× slower than FastRoute. At 1,000 routes, a full dispatch cycle takes 140 seconds vs FastRoute's 0.027 seconds. This is expected — Laravel's router is designed for a full-framework context where the bootstrap cost is amortized across the request lifecycle.
+Laravel's full-framework routing infrastructure makes it the heaviest router. A single request with 100 static routes takes 40.3 ms — 2,684× slower than FastRoute. At 1,000 routes, a full dispatch cycle takes 141 seconds vs FastRoute's 0.026 seconds. This is expected — Laravel's router is designed for a full-framework context where the bootstrap cost is amortized across the request lifecycle.
 
 ### Recommendations
 

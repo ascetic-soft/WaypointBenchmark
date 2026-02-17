@@ -31,11 +31,9 @@ final class WaypointAdapter implements AdapterInterface, CacheableAdapterInterfa
     public function registerRoutes(array $routes): void
     {
         foreach ($routes as $route) {
-            $handler = $route->handler;
-
             $this->registrar->addRoute(
                 path: $route->pattern,
-                handler: static fn(): string => $handler,
+                handler: [BenchmarkHandler::class, 'handle'],
                 methods: [$route->method],
             );
         }
@@ -48,12 +46,7 @@ final class WaypointAdapter implements AdapterInterface, CacheableAdapterInterfa
         $result = $this->matcher->match($method, $uri);
         $handler = $result->route->getHandler();
 
-        if ($handler instanceof \Closure) {
-            return $handler();
-        }
-
-        [$className, $methodName] = $handler;
-        return (new $className())->$methodName();
+        return \is_array($handler) ? $handler[1] : 'closure';
     }
 
     // --- CacheableAdapterInterface ---
