@@ -1,12 +1,14 @@
 # Waypoint Router Benchmark
 
+[Русская версия](README.ru.md)
+
 Benchmark suite comparing [Waypoint](https://github.com/ascetic-soft/Waypoint) router against popular PHP routing libraries.
 
 ## Routers Tested
 
 | Router | Package | Version | Description |
 |--------|---------|---------|-------------|
-| **Waypoint** | [ascetic-soft/waypoint](https://github.com/ascetic-soft/Waypoint) | v1.1.1 | PSR-15 router with prefix-trie matching |
+| **Waypoint** | [ascetic-soft/waypoint](https://github.com/ascetic-soft/Waypoint) | v1.2.1 | PSR-15 router with prefix-trie matching |
 | **FastRoute** | [nikic/fast-route](https://github.com/nikic/FastRoute) | v1.3.0 | Popular standalone regex-based router |
 | **Symfony** | [symfony/routing](https://symfony.com/doc/current/routing.html) | v7.4.4 | Symfony framework routing component |
 | **Laravel** | [illuminate/routing](https://github.com/illuminate/routing) | v11.47.0 | Laravel framework router |
