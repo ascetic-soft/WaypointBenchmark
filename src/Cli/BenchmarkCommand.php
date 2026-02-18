@@ -80,6 +80,11 @@ final class BenchmarkCommand extends Command
                     // Setup phase (warm cache) — outside timing loop
                     $setupFn($adapter);
 
+                    // Warmup request — first run, may include cold caches (opcache, etc.)
+                    $warmupStart = hrtime(true);
+                    $runFn($adapter);
+                    $warmupTime = (hrtime(true) - $warmupStart) / 1_000_000; // ms
+
                     $timings = [];
                     $peakMemory = 0;
 
@@ -106,6 +111,7 @@ final class BenchmarkCommand extends Command
 
                     $results[] = [
                         'name' => $name,
+                        'warmup_time' => $warmupTime,
                         'time' => $median,
                         'memory' => $peakMemory,
                         'error' => null,
@@ -121,6 +127,7 @@ final class BenchmarkCommand extends Command
 
                     $results[] = [
                         'name' => $name,
+                        'warmup_time' => PHP_FLOAT_MAX,
                         'time' => PHP_FLOAT_MAX,
                         'memory' => 0,
                         'error' => $e->getMessage(),
@@ -391,18 +398,25 @@ final class BenchmarkCommand extends Command
     }
 
     /**
-     * @param array<array{name: string, time: float, memory: int, error: string|null}> $results
+     * @param array<array{name: string, warmup_time: float, time: float, memory: int, error: string|null}> $results
      */
     private function renderTable(SymfonyStyle $io, array $results): void
     {
-        // Sort by time
         usort($results, static fn ($a, $b) => $a['time'] <=> $b['time']);
 
         $fastest = $results[0]['time'];
         $lowestMem = min(array_column($results, 'memory'));
 
         $table = new Table($io);
-        $table->setHeaders(['Rank', 'Router', 'Time (ms)', 'Time (%)', 'Peak Memory (MB)', 'Memory (%)']);
+        $table->setHeaders([
+            'Rank',
+            'Router',
+            'Warmup (ms)',
+            'Request (ms)',
+            'Request (%)',
+            'Peak Memory (MB)',
+            'Memory (%)',
+        ]);
 
         $rank = 1;
         foreach ($results as $result) {
@@ -410,6 +424,7 @@ final class BenchmarkCommand extends Command
                 $table->addRow([
                     $rank++,
                     $result['name'],
+                    'ERROR',
                     'ERROR',
                     '-',
                     '-',
@@ -426,6 +441,7 @@ final class BenchmarkCommand extends Command
             $table->addRow([
                 $rank++,
                 $result['name'],
+                number_format($result['warmup_time'], 3),
                 number_format($result['time'], 3),
                 number_format($timePct, 0) . '%',
                 number_format($memMb, 3),
