@@ -107,7 +107,7 @@ make all          # Install + benchmark
 
 ## Benchmark Results
 
-> PHP 8.4.5 | Linux | 2026-02-22 | 20 runs per test (median)
+> PHP 8.4.5 | Linux | 2026-02-28 | 20 runs per test (median)
 
 ### 1. Static Route Dispatching
 
@@ -117,43 +117,43 @@ make all          # Install + benchmark
 
 | Rank | Router | Warmup (ms) | Request (ms) | vs Fastest |
 |------|--------|-------------|--------------|------------|
-| 1 | FastRoute | 0.005 | 0.001 | 100% |
-| 2 | **Waypoint** | **1.662** | **0.002** | **200%** |
-| 3 | Symfony | 0.045 | 0.004 | 300% |
-| 4 | AltoRouter | 0.991 | 0.012 | 999% |
-| 5 | Bramus | 1.345 | 0.026 | 2,199% |
-| 6 | PHRoute | 3.138 | 0.059 | 4,997% |
-| 7 | League | 10.582 | 0.161 | 13,592% |
-| 8 | Nette | 7.577 | 0.246 | 20,688% |
-| 9 | Laravel | 35.401 | 1.015 | 85,450% |
+| 1 | FastRoute | 0.0059 | 0.0012 | 100% |
+| 2 | **Waypoint** | **1.9887** | **0.0024** | **200%** |
+| 3 | Symfony | 0.0380 | 0.0036 | 300% |
+| 4 | AltoRouter | 0.9498 | 0.0131 | 1,099% |
+| 5 | Bramus | 1.8106 | 0.0273 | 2,299% |
+| 6 | PHRoute | 3.7341 | 0.0689 | 5,797% |
+| 7 | League | 15.1085 | 0.1710 | 14,392% |
+| 8 | Nette | 8.7991 | 0.1745 | 14,691% |
+| 9 | Laravel | 42.7418 | 1.0994 | 92,546% |
 
 **Dispatch last route (worst case)**
 
 | Rank | Router | Warmup (ms) | Request (ms) | vs Fastest |
 |------|--------|-------------|--------------|------------|
-| 1 | **Waypoint** | **0.621** | **0.002** | **100%** |
-| 2 | FastRoute | 0.005 | 0.002 | 100% |
-| 3 | AltoRouter | 0.494 | 0.015 | 650% |
-| 4 | Symfony | 0.658 | 0.017 | 700% |
-| 5 | Bramus | 0.838 | 0.045 | 1,901% |
-| 6 | PHRoute | 0.113 | 0.059 | 2,501% |
-| 7 | League | 0.315 | 0.145 | 6,102% |
-| 8 | Nette | 0.786 | 0.224 | 9,452% |
-| 9 | Laravel | 3.309 | 0.956 | 40,260% |
+| 1 | FastRoute | 0.1116 | 0.0024 | 100% |
+| 2 | **Waypoint** | **0.6067** | **0.0024** | **100%** |
+| 3 | AltoRouter | 0.3716 | 0.0154 | 650% |
+| 4 | Symfony | 0.7219 | 0.0273 | 1,150% |
+| 5 | Bramus | 1.5423 | 0.0499 | 2,101% |
+| 6 | PHRoute | 0.2921 | 0.0653 | 2,751% |
+| 7 | League | 0.2185 | 0.1365 | 5,751% |
+| 8 | Nette | 1.0733 | 0.2458 | 10,353% |
+| 9 | Laravel | 3.8101 | 0.8620 | 36,309% |
 
 **Dispatch all 100 routes (100 requests)**
 
 | Rank | Router | Warmup (ms) | Request (ms) | vs Fastest |
 |------|--------|-------------|--------------|------------|
-| 1 | FastRoute | 0.451 | 0.012 | 100% |
-| 2 | **Waypoint** | **2.195** | **0.031** | **260%** |
-| 3 | Symfony | 3.653 | 0.634 | 5,340% |
-| 4 | AltoRouter | 1.070 | 0.875 | 7,370% |
-| 5 | Bramus | 2.568 | 2.352 | 19,810% |
-| 6 | PHRoute | 4.938 | 4.395 | 37,020% |
-| 7 | League | 13.580 | 9.610 | 80,940% |
-| 8 | Nette | 14.864 | 13.215 | 111,300% |
-| 9 | Laravel | 72.225 | 30.104 | 253,551% |
+| 1 | FastRoute | 0.3455 | 0.0142 | 100% |
+| 2 | **Waypoint** | **2.3081** | **0.0368** | **258%** |
+| 3 | Symfony | 2.0635 | 0.5390 | 3,783% |
+| 4 | AltoRouter | 1.2775 | 0.8940 | 6,275% |
+| 5 | Bramus | 2.8614 | 2.5551 | 17,933% |
+| 6 | PHRoute | 5.6409 | 4.8549 | 34,074% |
+| 7 | League | 13.3144 | 9.8511 | 69,140% |
+| 8 | Nette | 15.9348 | 14.0161 | 98,373% |
+| 9 | Laravel | 65.6307 | 29.3478 | 205,978% |
 
 ### 2. Dynamic Route Dispatching
 
@@ -163,43 +163,43 @@ make all          # Install + benchmark
 
 | Rank | Router | Warmup (ms) | Request (ms) | vs Fastest |
 |------|--------|-------------|--------------|------------|
-| 1 | FastRoute | 0.085 | 0.001 | 100% |
-| 2 | Symfony | 0.028 | 0.002 | 200% |
-| 3 | **Waypoint** | **0.496** | **0.004** | **300%** |
-| 4 | AltoRouter | 0.064 | 0.015 | 1,299% |
-| 5 | Bramus | 0.053 | 0.018 | 1,499% |
-| 6 | League | 0.705 | 0.191 | 16,091% |
-| 7 | Nette | 0.516 | 0.198 | 16,690% |
-| 8 | Laravel | 0.440 | 0.215 | 18,089% |
-| 9 | PHRoute | 0.671 | 0.227 | 19,089% |
+| 1 | FastRoute | 0.0843 | 0.0024 | 100% |
+| 2 | Symfony | 0.0285 | 0.0024 | 100% |
+| 3 | **Waypoint** | **0.4132** | **0.0024** | **100%** |
+| 4 | AltoRouter | 0.0582 | 0.0154 | 650% |
+| 5 | Bramus | 0.0534 | 0.0202 | 850% |
+| 6 | League | 0.7468 | 0.1900 | 8,002% |
+| 7 | Laravel | 0.5450 | 0.1912 | 8,052% |
+| 8 | Nette | 0.5972 | 0.2066 | 8,702% |
+| 9 | PHRoute | 0.7100 | 0.2292 | 9,652% |
 
 **Dispatch last route (worst case)**
 
 | Rank | Router | Warmup (ms) | Request (ms) | vs Fastest |
 |------|--------|-------------|--------------|------------|
-| 1 | **Waypoint** | **0.526** | **0.002** | **100%** |
-| 2 | FastRoute | 0.332 | 0.002 | 100% |
-| 3 | Symfony | 0.038 | 0.009 | 400% |
-| 4 | Bramus | 0.437 | 0.037 | 1,550% |
-| 5 | AltoRouter | 0.569 | 0.083 | 3,499% |
-| 6 | League | 0.278 | 0.198 | 8,349% |
-| 7 | PHRoute | 0.609 | 0.227 | 9,548% |
-| 8 | Nette | 1.577 | 0.261 | 10,998% |
-| 9 | Laravel | 1.080 | 0.534 | 22,496% |
+| 1 | **Waypoint** | **0.4167** | **0.0024** | **100%** |
+| 2 | FastRoute | 0.3229 | 0.0024 | 100% |
+| 3 | Symfony | 0.0392 | 0.0083 | 350% |
+| 4 | Bramus | 0.4417 | 0.0392 | 1,650% |
+| 5 | AltoRouter | 0.5521 | 0.0867 | 3,649% |
+| 6 | League | 0.2410 | 0.1805 | 7,599% |
+| 7 | PHRoute | 0.5913 | 0.2268 | 9,548% |
+| 8 | Nette | 1.3856 | 0.2671 | 11,248% |
+| 9 | Laravel | 1.1125 | 0.4797 | 20,197% |
 
 **Dispatch all 100 routes (100 requests)**
 
 | Rank | Router | Warmup (ms) | Request (ms) | vs Fastest |
 |------|--------|-------------|--------------|------------|
-| 1 | FastRoute | 0.147 | 0.090 | 100% |
-| 2 | **Waypoint** | **1.015** | **0.093** | **103%** |
-| 3 | Symfony | 0.943 | 0.484 | 537% |
-| 4 | Bramus | 2.821 | 2.624 | 2,908% |
-| 5 | AltoRouter | 5.200 | 4.721 | 5,232% |
-| 6 | League | 19.201 | 18.586 | 20,597% |
-| 7 | PHRoute | 22.549 | 21.864 | 24,230% |
-| 8 | Nette | 22.777 | 22.590 | 25,034% |
-| 9 | Laravel | 43.229 | 40.738 | 45,146% |
+| 1 | FastRoute | 0.1484 | 0.0807 | 100% |
+| 2 | **Waypoint** | **1.0531** | **0.0938** | **116%** |
+| 3 | Symfony | 0.8549 | 0.4072 | 504% |
+| 4 | Bramus | 3.1416 | 2.8673 | 3,551% |
+| 5 | AltoRouter | 5.2621 | 5.1375 | 6,363% |
+| 6 | League | 18.2774 | 17.6873 | 21,907% |
+| 7 | PHRoute | 23.0005 | 22.5920 | 27,982% |
+| 8 | Nette | 24.0061 | 23.7615 | 29,431% |
+| 9 | Laravel | 40.8077 | 38.8403 | 48,107% |
 
 ### 3. High-Load and Large-Scale
 
@@ -209,43 +209,43 @@ Each "request" = boot router from scratch or from cache + dispatch. The router i
 
 | Rank | Router | Warmup (ms) | Request (ms) | vs Fastest |
 |------|--------|-------------|--------------|------------|
-| 1 | **Waypoint** | **3.504** | **0.322** | **100%** |
-| 2 | FastRoute | 1.149 | 0.437 | 136% |
-| 3 | Symfony | 11.341 | 10.023 | 3,115% |
-| 4 | AltoRouter | 50.694 | 49.252 | 15,307% |
-| 5 | Bramus | 76.639 | 73.770 | 22,927% |
-| 6 | PHRoute | 346.687 | 347.982 | 108,150% |
-| 7 | League | 376.037 | 374.844 | 116,498% |
-| 8 | Nette | 490.674 | 483.586 | 150,294% |
-| 9 | Laravel | 790.868 | 791.921 | 246,123% |
+| 1 | **Waypoint** | **2.8567** | **0.3372** | **100%** |
+| 2 | FastRoute | 1.1291 | 0.4156 | 123% |
+| 3 | Symfony | 9.2087 | 8.0559 | 2,389% |
+| 4 | AltoRouter | 52.8493 | 51.4471 | 15,257% |
+| 5 | Bramus | 80.0730 | 75.8130 | 22,483% |
+| 6 | League | 356.7198 | 355.6014 | 105,459% |
+| 7 | PHRoute | 356.6106 | 356.7365 | 105,795% |
+| 8 | Nette | 508.4099 | 505.8655 | 150,022% |
+| 9 | Laravel | 763.6449 | 766.3448 | 227,271% |
 
 **100 dynamic routes x50 repeated dispatch (5,000 requests)**
 
 | Rank | Router | Warmup (ms) | Request (ms) | vs Fastest |
 |------|--------|-------------|--------------|------------|
-| 1 | FastRoute | 4.661 | 4.460 | 100% |
-| 2 | **Waypoint** | **6.106** | **5.008** | **112%** |
-| 3 | Symfony | 23.963 | 24.498 | 549% |
-| 4 | Bramus | 135.165 | 131.460 | 2,948% |
-| 5 | AltoRouter | 232.293 | 236.271 | 5,298% |
-| 6 | League | 962.688 | 955.455 | 21,425% |
-| 7 | PHRoute | 1,096.143 | 1,092.873 | 24,507% |
-| 8 | Nette | 1,147.740 | 1,135.098 | 25,453% |
-| 9 | Laravel | 2,198.798 | 2,190.101 | 49,111% |
+| 1 | FastRoute | 4.3586 | 4.2434 | 100% |
+| 2 | **Waypoint** | **6.1396** | **5.0947** | **120%** |
+| 3 | Symfony | 20.6270 | 20.4763 | 483% |
+| 4 | Bramus | 147.0620 | 145.5493 | 3,430% |
+| 5 | AltoRouter | 255.2979 | 256.4365 | 6,043% |
+| 6 | League | 869.3767 | 866.4441 | 20,418% |
+| 7 | PHRoute | 1,155.9078 | 1,165.1438 | 27,458% |
+| 8 | Nette | 1,211.9213 | 1,218.2164 | 28,708% |
+| 9 | Laravel | 2,052.2756 | 2,112.4945 | 49,783% |
 
 **1,000 mixed routes — dispatch all (1,000 requests)**
 
 | Rank | Router | Warmup (ms) | Request (ms) | vs Fastest |
 |------|--------|-------------|--------------|------------|
-| 1 | **Waypoint** | **5.889** | **0.683** | **100%** |
-| 2 | FastRoute | 2.655 | 1.547 | 227% |
-| 3 | Symfony | 40.953 | 39.172 | 5,738% |
-| 4 | AltoRouter | 202.317 | 201.372 | 29,496% |
-| 5 | Bramus | 275.514 | 268.851 | 39,381% |
-| 6 | PHRoute | 1,379.466 | 1,377.291 | 201,742% |
-| 7 | League | 1,492.840 | 1,492.054 | 218,552% |
-| 8 | Nette | 1,906.317 | 1,905.095 | 279,053% |
-| 9 | Laravel | 3,260.167 | 3,246.485 | 475,536% |
+| 1 | **Waypoint** | **6.9137** | **0.7005** | **100%** |
+| 2 | FastRoute | 2.7356 | 1.5055 | 215% |
+| 3 | Symfony | 36.7281 | 34.3701 | 4,906% |
+| 4 | AltoRouter | 210.0924 | 205.2719 | 29,303% |
+| 5 | Bramus | 296.7835 | 293.9505 | 41,962% |
+| 6 | PHRoute | 1,446.6098 | 1,435.9407 | 204,985% |
+| 7 | League | 1,442.8389 | 1,446.6347 | 206,512% |
+| 8 | Nette | 2,036.1102 | 2,063.0038 | 294,501% |
+| 9 | Laravel | 4,478.4178 | 3,820.1748 | 545,343% |
 
 ---
 
@@ -380,13 +380,25 @@ Laravel's full-framework routing infrastructure makes it the heaviest router. A 
 
 ### About this benchmark
 
+#### Benchmark Environment
+
+- OS: Ubuntu 25.04
+- Kernel: Linux 6.14.0-37-generic (x86_64)
+- CPU: AMD Ryzen 9 8945HX with Radeon Graphics
+- CPU topology: 16 cores / 32 threads
+- RAM: 30 GiB
+- PHP: 8.4.5 CLI (NTS) with Zend OPcache
+- Composer: 2.8.10
+- OPcache CLI: enabled (`opcache.enable_cli=On`)
+- JIT: tracing (`opcache.jit=tracing`, `opcache.jit_buffer_size=128M`)
+
 - Every request simulates a real PHP-FPM lifecycle: the router initializes from scratch or loads from cache, then dispatches
 - Cacheable routers (FastRoute, Symfony, Waypoint) have their cache pre-warmed before the timing loop — just like a production deployment
 - A **warmup request** runs first to separate cold-cache overhead (opcache, autoloader, etc.) from steady-state performance
 - **Warmup (ms)** = first request time (cold); **Request (ms)** = median of subsequent runs (warm)
 - Non-cacheable routers pay the full `initialize() + registerRoutes()` cost on every request — that's the real cost of not having cache support
 - All routers handle identical route sets generated deterministically by `RouteGenerator`
-- Results are from **20 runs (median)** on 2026-02-22, PHP 8.4.5, Linux
+- Results are from **20 runs (median)** on 2026-02-28, PHP 8.4.5, Linux
 - All routers use their core matching engines directly and return raw strings, except **League** which dispatches through a full PSR-7 pipeline (creating `ServerRequest`/`Response` on every request) — this reflects League's standard usage pattern
 
 ---

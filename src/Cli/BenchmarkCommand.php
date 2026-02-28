@@ -441,8 +441,8 @@ final class BenchmarkCommand extends Command
             $table->addRow([
                 $rank++,
                 $result['name'],
-                number_format($result['warmup_time'], 3),
-                number_format($result['time'], 3),
+                number_format($result['warmup_time'], 4),
+                number_format($result['time'], 4),
                 number_format($timePct, 0) . '%',
                 number_format($memMb, 3),
                 number_format($memPct, 0) . '%',
